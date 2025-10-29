@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
-import { Music2, Radio, Disc3 } from "lucide-react";
+import { Music2, Radio, Disc3, Clock } from "lucide-react";
 
 export default function Kiss957Widget() {
   const [nowPlaying, setNowPlaying] = useState(null);
@@ -24,6 +23,8 @@ export default function Kiss957Widget() {
     const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const history = nowPlaying?.song_history?.slice(0, 5) || [];
 
   return (
     <div
@@ -88,18 +89,41 @@ export default function Kiss957Widget() {
           </CardContent>
         </Card>
 
-        {/* Right Side - Song Requests (View Only) */}
+        {/* Right Side - Song History */}
         <Card className="bg-black/40 backdrop-blur-xl text-white border-none shadow-xl">
-          <CardContent className="p-8 flex flex-col justify-between h-full">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
-                <Music2 size={28} /> Song Request
-              </h1>
-              <div className="rounded-xl bg-white/10 text-gray-300 p-6 text-center text-lg">
-                Song requests are currently unavailable on this widget.<br />
-                Visit <strong>KISS 95.7</strong> to submit a request.
-              </div>
-            </div>
+          <CardContent className="p-8">
+            <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
+              <Clock size={28} /> Song History
+            </h1>
+
+            {loading ? (
+              <p>Loading history...</p>
+            ) : history.length > 0 ? (
+              <ul className="space-y-4">
+                {history.map((track, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-4 bg-white/10 rounded-xl p-3 hover:bg-white/20 transition-all"
+                  >
+                    <img
+                      src={track?.song?.art || "https://via.placeholder.com/80"}
+                      alt={track?.song?.title || "Album Art"}
+                      className="w-16 h-16 rounded-lg object-cover shadow-md"
+                    />
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        {track?.song?.title || "Unknown Title"}
+                      </h3>
+                      <p className="text-gray-300 text-sm">
+                        {track?.song?.artist || "Unknown Artist"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No recent songs found.</p>
+            )}
           </CardContent>
         </Card>
       </div>
